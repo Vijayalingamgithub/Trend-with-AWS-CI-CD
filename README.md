@@ -14,6 +14,16 @@ arn:aws:elasticloadbalancing:ap-south-1:680391390182:loadbalancer/net/k8s-trend-
 
 The endpoint and ARN can change when the Service is recreated. The Jenkins deployment stage prints the current values.
 
+## Deployment screenshots
+
+See the [full screenshot gallery](screenshot.md) for Docker, Terraform, GitHub webhook, Jenkins, EKS, and monitoring evidence.
+
+![Trend storefront served through the load balancer on port 3000](docs/screenshots/trend-application.jpg)
+
+![Jenkins deployment completed successfully](docs/screenshots/jenkins-deploy.jpg)
+
+![Prometheus graph showing a successful Trend health probe](docs/screenshots/prometheus-health.jpg)
+
 ## Local Docker test
 
 ```powershell
