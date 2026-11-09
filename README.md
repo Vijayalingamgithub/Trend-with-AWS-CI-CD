@@ -1,18 +1,60 @@
-# Trend on Amazon EKS
+# Trend Application Deployment
 
-Trend serves the prebuilt static site from `dist/` with Nginx on port 3000. Jenkins builds and tests the image, publishes it to Docker Hub, and deploys it to EKS Auto Mode. Prometheus continuously checks the public health endpoint.
+GUVI DevOps Project 2 using Docker, Terraform, Jenkins, Amazon EKS, and Prometheus.
 
-- [Application on port 3000](http://k8s-trend-trend-6bf4b2f0cb-5344529484c66e9e.elb.ap-south-1.amazonaws.com:3000/)
-- [Docker Hub image tags](https://hub.docker.com/r/dockervijay1998/trend/tags)
-- [Upstream static site](https://github.com/Vennilavanguvi/Trend)
+## Overview
 
-Network Load Balancer ARN for the recorded deployment:
+Trend is a static storefront served by Nginx on port **3000**. The upstream repository provides the compiled site in `dist/`. The Docker build packages those files with the Nginx configuration.
+
+Terraform provisions the AWS network, IAM roles, an EC2 instance for Jenkins, and the EKS Auto Mode cluster. When the GitHub webhook is configured, a push to `main` triggers Jenkins to build and smoke-test the image, publish it to Docker Hub with the commit SHA, and deploy it to EKS using `kubectl`. The public Network Load Balancer serves the storefront on port **3000**. Prometheus and Blackbox Exporter check its `/healthz` endpoint every 30 seconds.
+
+## Submission details
+
+| Item | Value |
+| --- | --- |
+| Author | Vijayalingam Periyasamy |
+| Repository | [Trend-with-AWS-CI-CD](https://github.com/Vijayalingamgithub/Trend-with-AWS-CI-CD) |
+| Upstream application | [Vennilavanguvi/Trend](https://github.com/Vennilavanguvi/Trend) |
+| AWS region | `ap-south-1` (Mumbai) |
+| Docker Hub image | [`dockervijay1998/trend`](https://hub.docker.com/r/dockervijay1998/trend/tags) |
+| EKS cluster | `trend-eks` (Auto Mode) |
+| Jenkins job | `trend-deploy` |
+| Kubernetes namespace | `trend` |
+| Deployment and Service | `trend` with 2 application replicas |
+| Application URL | [Trend on port 3000](http://k8s-trend-trend-6bf4b2f0cb-5344529484c66e9e.elb.ap-south-1.amazonaws.com:3000/) |
+
+**Network Load Balancer ARN**
 
 ```text
 arn:aws:elasticloadbalancing:ap-south-1:680391390182:loadbalancer/net/k8s-trend-trend-6bf4b2f0cb/5344529484c66e9e
 ```
 
-The endpoint and ARN can change when the Service is recreated. The Jenkins deployment stage prints the current values.
+The URL and ARN identify the deployment captured in the screenshots. If the Service is recreated, use the new values printed by Jenkins.
+
+## Architecture
+
+```text
+GitHub push to main
+  -> Tailscale Funnel -> EC2 webhook relay -> Jenkins
+  -> Build and smoke-test image -> Push commit-tagged image to Docker Hub
+  -> Apply Kubernetes manifests to EKS -> Wait for rollout and check /healthz
+
+Browser -> AWS Network Load Balancer :3000 -> Kubernetes Service -> Nginx Pods :3000
+Prometheus -> Blackbox Exporter -> Public /healthz endpoint
+```
+
+## Repository structure
+
+| Path | Purpose |
+| --- | --- |
+| `dist/` | Compiled Trend storefront |
+| `Dockerfile`, `nginx.conf` | Container image and web server configuration |
+| `terraform/` | AWS infrastructure and provider lock file |
+| `Jenkinsfile` | Declarative build, test, push, and deployment stages |
+| `k8s/` | Kubernetes Deployment and LoadBalancer Service |
+| `webhook/` | Signature-checking relay and its systemd service |
+| `monitoring/` | Prometheus and Blackbox Exporter configuration |
+| `docs/`, `screenshot.md` | Deployment report and screenshot gallery |
 
 ## Deployment screenshots
 
