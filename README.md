@@ -102,4 +102,4 @@ kubectl get nodes
 kubectl -n trend get deployment,pods,service
 ```
 
-The submission report includes evidence of the local Docker test, Terraform apply, EKS readiness, GitHub push delivery, Jenkins deployment, and Prometheus probe. When the review is finished, delete the Kubernetes Service, confirm AWS removed its load balancer, then run `terraform "-chdir=terraform" destroy` using the original state.
+The [deployment report](docs/Trend%20Deployment%20Report.docx) includes evidence of the local Docker test, Terraform apply, EKS readiness, GitHub push delivery, Jenkins deployment, and Prometheus probe. When the review is finished, delete the Kubernetes Service, confirm AWS removed its load balancer, then run `terraform "-chdir=terraform" destroy` using the original state.
